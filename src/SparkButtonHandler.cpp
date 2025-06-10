@@ -8,12 +8,12 @@
 #include "SparkButtonHandler.h"
 
 // Intialize buttons
-BfButton SparkButtonHandler::btn_preset1_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET1_GPIO, false, HIGH);
-BfButton SparkButtonHandler::btn_preset2_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET2_GPIO, false, HIGH);
-BfButton SparkButtonHandler::btn_preset3_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET3_GPIO, false, HIGH);
-BfButton SparkButtonHandler::btn_preset4_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET4_GPIO, false, HIGH);
-BfButton SparkButtonHandler::btn_bank_down_(BfButton::STANDALONE_DIGITAL, BUTTON_BANK_DOWN_GPIO, false, HIGH);
-BfButton SparkButtonHandler::btn_bank_up_(BfButton::STANDALONE_DIGITAL, BUTTON_BANK_UP_GPIO, false, HIGH);
+BfButton SparkButtonHandler::btn_preset1_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET1_GPIO, true, LOW);
+BfButton SparkButtonHandler::btn_preset2_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET2_GPIO, true, LOW);
+BfButton SparkButtonHandler::btn_preset3_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET3_GPIO, true, LOW);
+BfButton SparkButtonHandler::btn_preset4_(BfButton::STANDALONE_DIGITAL, BUTTON_PRESET4_GPIO, true, LOW);
+BfButton SparkButtonHandler::btn_bank_down_(BfButton::STANDALONE_DIGITAL, BUTTON_BANK_DOWN_GPIO, true, LOW);
+BfButton SparkButtonHandler::btn_bank_up_(BfButton::STANDALONE_DIGITAL, BUTTON_BANK_UP_GPIO, true, LOW);
 
 // Initialize SparkDataControl;
 SparkDataControl *SparkButtonHandler::spark_dc_ = nullptr;
@@ -42,15 +42,20 @@ OperationMode SparkButtonHandler::checkBootOperationMode() {
 
     OperationMode operationMode;
     // AMP mode when Preset 1 is pressed during startup
-    if (digitalRead(BUTTON_PRESET1_GPIO) == HIGH) {
+    if (digitalRead(BUTTON_PRESET1_GPIO) == LOW) {
         operationMode = SPARK_MODE_AMP;
-    } else if (digitalRead(BUTTON_PRESET3_GPIO) == HIGH) {
+    } else if (digitalRead(BUTTON_PRESET3_GPIO) == LOW) {
         operationMode = SPARK_MODE_KEYBOARD;
     } else { // default mode: APP
         operationMode = SPARK_MODE_APP;
     }
 
     Serial.printf("Operation mode (boot): %d\n", operationMode);
+
+    // TODO: figure out button logic to determine operation mode and get rid of the hack below
+    operationMode = SPARK_MODE_APP;
+    Serial.printf("Ignoring selected operation mode, overriding with: %d\n", operationMode);
+    
     return operationMode;
 }
 
